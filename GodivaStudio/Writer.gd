@@ -49,8 +49,8 @@ func _init(metadata,model=null):
 	reset()
 
 func population_timing(profiles:Array)->Dictionary:
-	# Average corresponding within-person quantiles; each typist gets one vote
-	# in the timing baseline. Finger labels keep their original observation counts.
+	# Average timing profiles with equal weight. The public edition supplies one
+	# illustrative profile. Finger totals retain the input profiles' weights.
 	var baseline={"median":0.,"intervals":{},"all":[0.,0.,0.,0.,0.],"fingers":{}}
 	for person in profiles:
 		baseline.median+=float(person.median)/profiles.size()
@@ -264,7 +264,7 @@ func reset_gesture_history():
 
 func timing_quantiles(previous:String,key:String)->Array:
 	if previous.is_empty():return profile.all
-	# The study measured letter transitions. Service keys and punctuation use
+	# Finger assignments describe letter transitions. Service keys and punctuation use
 	# the operator's overall interval distribution.
 	if not profile.fingers.has(previous.to_lower()) or not profile.fingers.has(key.to_lower()):
 		return profile.all

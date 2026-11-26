@@ -8,6 +8,8 @@ jobs:
     timeout-minutes: 15
     steps:
       - uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683
+      - name: Verify Hilda’s Blender source legends
+        run: python tools/check_hilda_builder.py
       - name: Download and verify Godot 4.4.1
         shell: pwsh
         run: |

@@ -31,19 +31,19 @@ def material(name, rgb, metal=0, rough=.4):
     return m
 
 
-enamel = material("Olympia â€¢ warm ivory enamel", (.70,.64,.49), .16,.31)
-base = material("Olympia â€¢ textured basalt chassis", (.17,.16,.14), .32,.54)
-ivory = material("Olympia â€¢ cream keytop", (.82,.775,.638), .02,.32)
-sage = material("Olympia â€¢ sea green controls", (.34,.49,.375), .05,.31)
-steel = material("Olympia â€¢ bright steel", (.61,.62,.60), .82,.25)
-barsteel = material("Olympia â€¢ typebar steel", (.38,.375,.34), .70,.32)
-dark = material("Olympia â€¢ phosphated iron", (.053,.054,.051), .65,.39)
-rubber = material("Olympia â€¢ platen rubber", (.032,.030,.028), .03,.74)
-black = material("Olympia â€¢ black legends", (.013,.013,.012), .03,.44)
-red = material("Olympia â€¢ red silk", (.32,.022,.029), .0,.82)
-ribbonblack = material("Olympia â€¢ black silk", (.028,.019,.025), .0,.82)
-teal = material("Olympia â€¢ segment medallion", (.112,.18,.18), .24,.46)
-blue = material("Olympia â€¢ selector blue", (.017,.044,.14))
+enamel = material("Olympia • warm ivory enamel", (.70,.64,.49), .16,.31)
+base = material("Olympia • textured basalt chassis", (.17,.16,.14), .32,.54)
+ivory = material("Olympia • cream keytop", (.82,.775,.638), .02,.32)
+sage = material("Olympia • sea green controls", (.34,.49,.375), .05,.31)
+steel = material("Olympia • bright steel", (.61,.62,.60), .82,.25)
+barsteel = material("Olympia • typebar steel", (.38,.375,.34), .70,.32)
+dark = material("Olympia • phosphated iron", (.053,.054,.051), .65,.39)
+rubber = material("Olympia • platen rubber", (.032,.030,.028), .03,.74)
+black = material("Olympia • black legends", (.013,.013,.012), .03,.44)
+red = material("Olympia • red silk", (.32,.022,.029), .0,.82)
+ribbonblack = material("Olympia • black silk", (.028,.019,.025), .0,.82)
+teal = material("Olympia • segment medallion", (.112,.18,.18), .24,.46)
+blue = material("Olympia • selector blue", (.017,.044,.14))
 
 
 def pivot(name, xyz=(0,0,0), parent=None):
@@ -248,9 +248,9 @@ text("Raised Olympia script","Olympia",(0,-.364,.94),.182,steel,cover,math.pi/2,
 # Owner photo 09 shows an exclamation mark above the three-quarters fraction.
 rows=[
     [("+","="),('"',"2"),("#","3"),("$","4"),("%","5"),("_","6"),("&","7"),
-     ("'","8"),("(","9"),(")","0"),("*","-"),("!","Â¾"),("TAB",)],
-    [("M R",)]+[(v,) for v in "QWERTYUIOP"]+[("Â¼","Â½"),("â†’",)],
-    [("",)]+[(v,) for v in "ASDFGHJKL"]+[(":",";"),("@","Â¢")],
+     ("'","8"),("(","9"),(")","0"),("*","-"),("!","¾"),("TAB",)],
+    [("M R",)]+[(v,) for v in "QWERTYUIOP"]+[("¼","½"),("→",)],
+    [("",)]+[(v,) for v in "ASDFGHJKL"]+[(":",";"),("@","¢")],
     [("",)]+[(v,) for v in "ZXCVBNM"]+[(",",","),(".","."),("?","/"),("",)]]
 shift_pivots={}
 printing_keys=[]
@@ -273,7 +273,7 @@ for row,legends in enumerate(rows):
             shift_pivots[side]=p
         elif len(labels)==2 or (len(labels[0])==1 and labels[0].isalpha()):
             lower,upper=(labels[-1],labels[0]) if len(labels)==2 else (labels[0].lower(),labels[0])
-            ident=part_names.get(lower,upper)
+            ident=part_names[lower] if len(labels)==2 else upper
             p=pivot(f"Hilda{ident}Key",(x,.10,.36),frame)
             capname=f"Hilda{ident}Keycap"
             printing_keys.append((x,row,ident,lower,upper,p))
@@ -365,8 +365,8 @@ for p,a in bar_axes:
     p.rotation_euler.z=a
     for child,home in child_rest:
         child.matrix_basis=Matrix.Rotation(-a,4,'Z') @ home
-brass=material("Olympia â€¢ tarnished linkage collars",(.40,.32,.17),.65,.38)
-# Owner underside views 15â€“18 show the stepped lever bank and its cross shafts.
+brass=material("Olympia • tarnished linkage collars",(.40,.32,.17),.65,.38)
+# Owner underside views 15–18 show the stepped lever bank and its cross shafts.
 for x in (-1.38,1.38):
     box("Base frame rail",(x,-.02,.133),(.087,2.64,.098),dark,frame,.015)
 for y,z in ((-.68,.118),(.57,.143),(.99,.18)):
@@ -420,7 +420,7 @@ box("Return lever black grip",(-1.69,.055,1.397),(.106,.48,.055),dark,car,.021)
 skin("Return lever polished spine",[
     [(-1.74,-.43,z),(-1.718,-.47,z),(-1.57,.99,z),(-1.62,1.04,z)]
     for z in (1.421,1.438)],steel,car,.008)
-guide=material("Olympia â€¢ amber transparent line guides",(.76,.60,.35),0,.19)
+guide=material("Olympia • amber transparent line guides",(.76,.60,.35),0,.19)
 guide.diffuse_color=(.76,.60,.35,.27)
 guide.node_tree.nodes.get("Principled BSDF").inputs["Alpha"].default_value=.27
 for side in (-1,1):

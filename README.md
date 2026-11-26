@@ -1,8 +1,8 @@
 # Typewriter Emulator
 
-[Download the Windows release](https://github.com/ImperishableNEET/Typewriter-Emulator/releases/latest) · [MIT code license](LICENSE) · [Model and audio licenses](ASSETS.md)
+I photographed what my Olympia SM9 De Luxe, Hilda, typed and recorded how her keys sounded. Those impressions and recordings are what you see and hear when you type on her in this emulator. You can also sit down at Godiva, my French Canadian Hermes 3000. Open either machine’s cover to watch the linkage behind a keystroke.
 
-Operate two reconstructions of real typewriters in Godot. **Godiva** is a Hermes 3000 with a French Canadian keyboard. **Hilda** is an Olympia SM9 De Luxe with 44 printing keys and 86 distinct faces recovered from her owner's typing specimen.
+[Download the Windows release](https://github.com/ImperishableNEET/Typewriter-Emulator/releases/latest) · [MIT code license](LICENSE) · [Model and audio licenses](ASSETS.md)
 
 ![Hilda typing the quick brown fox pangram](docs/Emulated%20pangram.png)
 
