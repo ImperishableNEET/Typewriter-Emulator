@@ -1,0 +1,24 @@
+name: Test writing desks
+on: [push, pull_request]
+permissions:
+  contents: read
+jobs:
+  test:
+    runs-on: windows-2022
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683
+      - name: Download and verify Godot 4.4.1
+        shell: pwsh
+        run: |
+          $zip = Join-Path $env:RUNNER_TEMP godot.zip
+          Invoke-WebRequest 'https://github.com/godotengine/godot-builds/releases/download/4.4.1-stable/Godot_v4.4.1-stable_win64.exe.zip' -OutFile $zip
+          if ((Get-FileHash $zip -Algorithm SHA512).Hash -ne '266978b803f7532edc69bdd5d8c4fdced0ea97aef1224a8879616398a2559e135520e186add06b532aa92bdfeecf6ac024634024de4b3abd69f6c34e6d6d0563') { throw 'Godot checksum mismatch' }
+          Expand-Archive $zip "$env:RUNNER_TEMP/engine"
+      - name: Import and run source checks
+        shell: pwsh
+        run: |
+          $engine = (Get-ChildItem "$env:RUNNER_TEMP/engine" -Recurse -Filter '*_console.exe').FullName
+          & $engine --headless --path GodivaStudio --import
+          if ($LASTEXITCODE) { exit $LASTEXITCODE }
+          & ./tools/Test-Source.ps1 -Godot $engine

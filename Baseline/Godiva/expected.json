@@ -1,0 +1,51 @@
+{
+	"fresh_keys": [
+		[
+			"L",
+			"l"
+		],
+		[
+			"L",
+			"l"
+		],
+		[
+			"/ / -",
+			"-"
+		],
+		[
+			"/ / -",
+			"/"
+		],
+		[
+			"^ / `",
+			"^"
+		],
+		[
+			"E",
+			"e"
+		],
+		[
+			"H",
+			"H"
+		]
+	],
+	"mounted_state": {
+		"column": 44.0,
+		"finished_count": 3.0,
+		"half_line": 2.0,
+		"ribbon": "Black",
+		"stock": "Letter",
+		"strike_count": 48.0
+	},
+	"pixel_sha256": {
+		"draft": "419318022a8ec42cf8597b374b7881ffc4b1edec6ab26d380fbf86ef1dc73870",
+		"draft_carbon": "751904a9fdf4bfb24ffa0f3c035f597d91905ee8578e52efc8cfcb0c7764e9b4",
+		"fresh_typing": "8e72f9b82d73160ba556faf945acc8aae793b0a417128d69c6ee10bd7645940a",
+		"page_1": "c1477b6a2d007d0a45a3cb6b4e27c4ee1d3d6c47baea7df09467eb0f73711482",
+		"page_1_carbon": "f4584977f4ede5aa197e47772d23ddf3a775826a666114a514ef6158b97bbb3a",
+		"page_2": "b8d94e9ca5f342ebce11c21ba58855e01e20680fcced766b08a8a3a79f4937d9",
+		"page_2_carbon": "c96e216c7ff3a25f428824049744c77e59cb272de179f9b93835e60677bcf720",
+		"page_3": "38b6f2ab63195b30d60a57ea32e16c0c294a738f132c003b835f63f5d7285204",
+		"page_3_carbon": "e29315026102152ca0753f0db9ed359c7c12f5b00bba9a1d416577df4319b4b4"
+	}
+}

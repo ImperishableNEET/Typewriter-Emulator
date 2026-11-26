@@ -1,0 +1,25 @@
+[gd_resource type="Resource" load_steps=6 format=3]
+
+[ext_resource type="Script" path="res://machines/MachineProfile.gd" id="1"]
+[ext_resource type="Script" path="res://Machine.gd" id="2"]
+[ext_resource type="Script" path="res://machines/godiva/GodivaKeyboard.gd" id="3"]
+[ext_resource type="Texture2D" path="res://assets/strikes.png" id="4"]
+[ext_resource type="Texture2D" path="res://assets/pressure.png" id="5"]
+
+[resource]
+script = ExtResource("1")
+id = "godiva"
+nickname = "Godiva"
+model = "Hermes 3000"
+rig_script = ExtResource("2")
+manifest_path = "res://assets/machine.json"
+geometry_path = "res://assets/machine.bin"
+strike_atlas = ExtResource("4")
+pressure_atlas = ExtResource("5")
+sound_directory = "res://assets/sounds"
+autosave_path = "user://current.godiva"
+document_extension = "godiva"
+keyboard = ExtResource("3")
+ribbon_modes = Array[String](["Black", "Red", "Split", "Stencil"])
+credits = "“Godiva” is a real Hermes 3000, reconstructed from the machine and its photographed typing specimen.\n\nTyping rhythm in this edition uses authored simulation parameters.\n\nTypebar and margin bell recordings from a Hermes 3000, recorded by supersupernator (CC0), edited for Godiva. https://freesound.org/people/supersupernator/sounds/519622/\nSpacebar: Joseph Sardin, Hermes Precisa 305 (CC0). https://bigsoundbank.com/typewriter-space-s2843.html and https://bigsoundbank.com/typewriter-8-s2841.html\nCarriage return: knufds, antique manual typewriter (CC0). https://freesound.org/people/knufds/sounds/345955/ and evsecrets, Hermes Baby carriage returns and platen clicks (CC0), https://freesound.org/people/evsecrets/sounds/334458/\nSynthesized backspace linkage.\nShift press and release recorded by moodyfingers on a Silver Typewriter (CC0), edited against a 1967 Hermes 3000 demonstration. https://freesound.org/people/moodyfingers/sounds/734316/ and https://freesound.org/people/moodyfingers/sounds/734317/\nOther mechanical sounds are recreated."
+operator_notes = "Hold Ctrl+Alt+Shift and press C for ç, E for é, Q for ¼, H for ½, or P for ¢.\nCtrl+Shift toggles Shift Lock. Tap left Shift to release it. Drag either Shift to move the basket, or fully depress Shift Lock to latch it.\n\\ or | releases the right margin and clears a jam. Hold it during Return to pass the left stop.\nCtrl+1/2/3/4 selects Black/Red/Split/Stencil. Ctrl+[ or ] selects left or right ribbon take-up.\nCtrl++ sets a tab, Ctrl+- clears it, and Ctrl+. clears all tab stops.\nEnter returns the carriage. Backspace moves back to overstrike.\nAlt + ↑ / ↓ rolls half a line. Tab goes to the next stop.\nHold either carriage-end button and drag. Home / End holds the left / right release.\nWhile held, drag the carriage or use ← / → to choose a column.\nClick a flying-margin lever or press Alt+[ / Alt+] to set that margin here.\nCtrl+Alt+Shift+1-4 selects touch positions 1-4. Ctrl+< or Ctrl+> selects lighter or heavier touch. Click its lever for heavier, Shift-click for lighter.\nClick to type. Drag a key down and back to inspect its action; a faster downstroke hits harder.\nDrag an exposed typebar or use Cutaway to pull its draw link or sublever. Pull a caught action back to clear it. Hold the steel type guide at its shift stop while typing.\nGrab the return lever, platen knobs, bail, rollers, paper controls and selectors. Hover for each gesture."

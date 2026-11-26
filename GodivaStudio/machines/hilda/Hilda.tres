@@ -1,0 +1,24 @@
+[gd_resource type="Resource" load_steps=6 format=3]
+
+[ext_resource type="Script" path="res://machines/MachineProfile.gd" id="1"]
+[ext_resource type="Script" path="res://machines/hilda/HildaRig.gd" id="2"]
+[ext_resource type="Script" path="res://machines/hilda/HildaKeyboard.gd" id="3"]
+[ext_resource type="Texture2D" path="res://machines/hilda/strikes.png" id="4"]
+[ext_resource type="Texture2D" path="res://machines/hilda/pressure.png" id="5"]
+
+[resource]
+script = ExtResource("1")
+id = "hilda"
+nickname = "Hilda"
+model = "Olympia SM9 De Luxe"
+rig_script = ExtResource("2")
+manifest_path = "res://machines/hilda/manifest.json"
+geometry_path = "res://machines/hilda/Hilda.glb"
+strike_atlas = ExtResource("4")
+pressure_atlas = ExtResource("5")
+autosave_path = "user://current.hilda"
+document_extension = "hilda"
+keyboard = ExtResource("3")
+ribbon_modes = Array[String](["Black", "Red"])
+credits = "The owner photographed Hilda, an Olympia SM9 De Luxe, and her typed pangrams. The printed alphabet comes from the two black specimen lines directly below the introductory text. Carbon contact is estimated from these impressions."
+operator_notes = "Type normally or click any printing key. Hold Shift when clicking for its upper face. Typing 1 operates lowercase l.\n\nFor fractions and cents hold Ctrl + Alt + Shift and press Q for ¼, H for ½, T for ¾ or P for ¢.\n\nOlympia layout follows the positions on a US keyboard. The top row from 1 through = operates Hilda’s top row. Left bracket operates ½ / ¼ and the apostrophe key operates ¢ / @. Hold Shift for the second face.\n\nSpace, Backspace and Return position the sheet."

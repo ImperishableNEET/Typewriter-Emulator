@@ -1,0 +1,41 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="256" height="256" viewBox="0 0 256 256">
+  <defs>
+    <linearGradient id="paper" x2=".14" y2="1" gradientUnits="objectBoundingBox">
+      <stop stop-color="#FFFCDE"/><stop offset=".65" stop-color="#F4E8CF"/><stop offset="1" stop-color="#D6CAAC"/>
+    </linearGradient>
+    <linearGradient id="enamel" x1="0" y1="0" x2=".24" y2="1">
+      <stop stop-color="#CAEDCA"/><stop offset=".48" stop-color="#A9D0AB"/><stop offset="1" stop-color="#79A48D"/>
+    </linearGradient>
+    <linearGradient id="foot" x1="0" y1="0" x2="0" y2="1">
+      <stop stop-color="#77A68E"/><stop offset="1" stop-color="#55816F"/>
+    </linearGradient>
+  </defs>
+  <!-- Platen, paper and return lever. The folded sheet makes the silhouette
+       legible even at a small taskbar size. -->
+  <path d="M61 85 56 24q0-7 7-7h116l17 16 4 51z" fill="url(#paper)" stroke="#374C40" stroke-width="4" stroke-linejoin="round"/>
+  <path d="m179 18 1 14q0 4 4 4l11-2" fill="#D3C7A7"/>
+  <path d="M76 40h56m-55 11h79" fill="none" stroke="#8D9680" stroke-width="4" stroke-linecap="round"/>
+  <path d="M31 85 18 80 10 54q-1-4 4-5h6l6 24 19 2" fill="#B6C8B7" stroke="#364B40" stroke-width="4" stroke-linejoin="round"/>
+  <path d="M25 71h206v24H25z" fill="#293E34"/>
+  <g fill="#88B198" stroke="#344F43" stroke-width="4">
+    <rect x="16" y="66" width="17" height="32" rx="6"/><rect x="223" y="66" width="17" height="32" rx="6"/>
+  </g>
+  <path d="M40 76h177" stroke="#D9D9B9" stroke-width="5" stroke-linecap="round"/>
+  <path d="M80 72v9m92-9v9" stroke="#31473B" stroke-width="9" stroke-linecap="round"/>
+  <!-- Rounded first-series body, with its scalloped ribbon opening. -->
+  <path d="M26 105q2-17 20-19h164q17 1 20 19l15 95v14q0 13-15 17H26q-15-3-15-17v-14z" fill="url(#foot)" stroke="#304C40" stroke-width="5" stroke-linejoin="round"/>
+  <path d="M27 103q3-15 20-16h162q15 1 19 16l15 94q2 15-15 18H28q-17-3-14-18z" fill="url(#enamel)"/>
+  <path d="M31 105q2-12 15-13h43m79 0h40q12 1 16 13" fill="none" stroke="#E0F2D2" stroke-width="3" stroke-linecap="round"/>
+  <path d="M79 89q11 0 17 6 5 5 15 5h34q10 0 16-5 7-6 16-6-1 15-15 23-14 8-34 8t-34-8Q81 105 79 89Z" fill="#273F34"/>
+  <path d="M99 108q30 12 58 0" fill="none" stroke="#AD8F75" stroke-width="3" stroke-linecap="round"/>
+  <path d="M113 130h30" fill="none" stroke="#658677" stroke-width="4" stroke-linecap="round"/>
+  <!-- Key wells are rounded at the top corners, following the real casting. -->
+  <path d="M48 147q2-9 12-9h136q10 0 12 9l9 47q2 8-8 9H47q-10-1-8-9z" fill="#334D40" stroke="#83A990" stroke-width="3"/>
+  <g fill="#B4DEB0">
+    <path d="M58 148h138" stroke="#B4DEB0" stroke-width="7" stroke-linecap="round" stroke-dasharray="10 8"/>
+    <path d="M53 161h150" stroke="#B4DEB0" stroke-width="7" stroke-linecap="round" stroke-dasharray="10 8"/>
+    <path d="M57 174h145" stroke="#B4DEB0" stroke-width="7" stroke-linecap="round" stroke-dasharray="10 8"/>
+    <rect x="78" y="186" width="101" height="8" rx="3"/>
+  </g>
+  <path d="M29 222h198" stroke="#8FB7A0" stroke-width="2" stroke-linecap="round"/>
+</svg>

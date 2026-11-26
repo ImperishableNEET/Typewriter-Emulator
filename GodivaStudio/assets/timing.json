@@ -1,0 +1,126 @@
+{
+  "source": "Authored simulation defaults, illustrative milliseconds",
+  "profiles": [
+    {
+      "median": 170,
+      "n": 1,
+      "all": [
+        70,
+        115,
+        170,
+        235,
+        340
+      ],
+      "intervals": {
+        "alternate": [
+          63,
+          104,
+          153,
+          212,
+          306
+        ],
+        "same_hand": [
+          76,
+          124,
+          184,
+          254,
+          367
+        ],
+        "repeat": [
+          58,
+          95,
+          141,
+          195,
+          282
+        ],
+        "same_finger": [
+          87,
+          143,
+          211,
+          291,
+          422
+        ]
+      },
+      "fingers": {
+        "q": {
+          "L_little": 1
+        },
+        "a": {
+          "L_little": 1
+        },
+        "z": {
+          "L_little": 1
+        },
+        "w": {
+          "L_ring": 1
+        },
+        "s": {
+          "L_ring": 1
+        },
+        "x": {
+          "L_ring": 1
+        },
+        "e": {
+          "L_middle": 1
+        },
+        "d": {
+          "L_middle": 1
+        },
+        "c": {
+          "L_middle": 1
+        },
+        "r": {
+          "L_index": 1
+        },
+        "f": {
+          "L_index": 1
+        },
+        "v": {
+          "L_index": 1
+        },
+        "t": {
+          "L_index": 1
+        },
+        "g": {
+          "L_index": 1
+        },
+        "b": {
+          "L_index": 1
+        },
+        "y": {
+          "R_index": 1
+        },
+        "h": {
+          "R_index": 1
+        },
+        "n": {
+          "R_index": 1
+        },
+        "u": {
+          "R_index": 1
+        },
+        "j": {
+          "R_index": 1
+        },
+        "m": {
+          "R_index": 1
+        },
+        "i": {
+          "R_middle": 1
+        },
+        "k": {
+          "R_middle": 1
+        },
+        "o": {
+          "R_ring": 1
+        },
+        "l": {
+          "R_ring": 1
+        },
+        "p": {
+          "R_little": 1
+        }
+      }
+    }
+  ]
+}

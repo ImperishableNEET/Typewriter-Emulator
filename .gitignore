@@ -1,0 +1,13 @@
+.godot/
+__pycache__/
+*.blend1
+*.blend2
+*.tmp
+*.log
+*.exe
+*.pck
+*.dll
+build/
+.DS_Store
+Thumbs.db
+GodivaStudio/assets/wooting-touch.bin

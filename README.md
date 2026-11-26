@@ -1,0 +1,37 @@
+# Typewriter Emulator
+
+Operate two reconstructions of real typewriters in Godot. **Godiva** is a Hermes 3000 with a French Canadian keyboard. **Hilda** is an Olympia SM9 De Luxe with 44 printing keys and 86 distinct faces recovered from her owner's typing specimen.
+
+![Hilda typing the quick brown fox pangram](docs/Emulated%20pangram.png)
+
+## Run
+
+Open `GodivaStudio/project.godot` with Godot **4.4.1** and press **F6** with the desk scene open, or **F5** to run the project. The project includes both runtime models and the imported source assets Godot needs. Initial import builds the local cache. Blender is optional.
+
+Choose **Machines → Hilda**, then **Open cover** and **Type pangram**. You can type, click a cap, hold Shift for its other face, or open **Key guide**. The **Olympia layout** maps physical computer key positions to Hilda’s photographed caps. Ctrl+Alt+Shift with Q, H, T or P gives ¼, ½, ¾ or ¢. Godiva has her own bindings under **Machine controls**. Each desk keeps its mounted draft. Finished sheets can be read on both.
+
+[Full Olympia keyboard proof](docs/Keyboard%20proof.png) · [Hilda’s recorded strikes](docs/Recorded%20strikes.md)
+
+## Build and verify on Windows
+
+Install Godot 4.4.1 and its matching Windows export templates. From the repository root in PowerShell, set `$godot` to the console executable.
+
+```powershell
+& $godot --headless --path GodivaStudio --import
+& ./tools/Test-Source.ps1 -Godot $godot
+New-Item -ItemType Directory -Force build | Out-Null
+$exe = Join-Path (Resolve-Path build) 'Typewriter Emulator.exe'
+& $godot --headless --path GodivaStudio --export-release 'Windows Desktop' $exe
+& ./Baseline/Godiva/Verify.ps1 -Godot $godot -Executable $exe
+& ./Baseline/Hilda/Verify.ps1 -Godot $godot -Executable $exe
+```
+
+Tests use a temporary Windows profile to protect mounted drafts. The optional Windows Wooting bridge can be compiled with MinGW using the command at the top of [wooting_touch.c](Source/wooting_touch.c). It uses the operator’s locally installed analog SDK. The default checkout uses simulated touch.
+
+## Assets and edition differences
+
+The public-source edition uses a synthesized Godiva backspace and authored timing defaults. Hilda uses six takes extracted from the owner’s recording. The public tree contains derived impressions, cropped proof images and machine sounds. The owner’s original photographs, raw phone video and research records stay in the authoring archive.
+
+The [Blender builder](Source/hilda/build_hilda.py) generates Hilda’s editable scene and runtime GLB. To create both, run `blender --background --factory-startup --python-exit-code 1 --python Source/hilda/build_hilda.py` with Blender 5.0.1. The Godiva runtime uses `assets/machine.json` and `assets/machine.bin`. Her private editable scene contains embedded research and reference materials. The extraction scripts for Hilda document the optical and audio processing and require the original owner media to regenerate the shipped derivatives.
+
+See [asset credits and rights](NOTICE.md) before redistribution.
