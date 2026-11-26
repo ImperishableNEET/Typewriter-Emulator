@@ -9,14 +9,18 @@ $engine = (Resolve-Path -LiteralPath $Godot).Path
 $work = Join-Path ([IO.Path]::GetTempPath()) ('godiva-baseline-' + [guid]::NewGuid())
 $null = New-Item -ItemType Directory -Path $work
 $oldAppData = $env:APPDATA
+$oldTemp = $env:TEMP
 $oldFixture = $env:GODIVA_FIXTURE_DIR
 try {
     $env:APPDATA = $work
+    $env:TEMP = $work
+    New-Item -ItemType Directory -Path (Join-Path $work 'godiva-player-tools') | Out-Null
     $env:GODIVA_FIXTURE_DIR = $PSScriptRoot
     function Assert-Run([string[]]$Arguments, [string]$LogName, [string]$Marker) {
         $path = Join-Path $work $LogName
         & $engine @Arguments *> $path
         if ($LASTEXITCODE -ne 0 -or !(Select-String -LiteralPath $path -SimpleMatch -Pattern $Marker) -or (Select-String -LiteralPath $path -Pattern 'ERROR:')) {
+            Get-Content -LiteralPath $path -Tail 50 | Write-Host
             throw "Godiva baseline check failed. See $path"
         }
         Write-Host $Marker
@@ -26,5 +30,6 @@ try {
     Write-Host "Isolated profile and logs: $work"
 } finally {
     $env:APPDATA = $oldAppData
+    $env:TEMP = $oldTemp
     $env:GODIVA_FIXTURE_DIR = $oldFixture
 }
