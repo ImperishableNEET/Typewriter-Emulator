@@ -1,5 +1,7 @@
 # Typewriter Emulator
 
+[Download the Windows release](https://github.com/ImperishableNEET/Typewriter-Emulator/releases/latest) · [MIT code license](LICENSE) · [Model and audio licenses](ASSETS.md)
+
 Operate two reconstructions of real typewriters in Godot. **Godiva** is a Hermes 3000 with a French Canadian keyboard. **Hilda** is an Olympia SM9 De Luxe with 44 printing keys and 86 distinct faces recovered from her owner's typing specimen.
 
 ![Hilda typing the quick brown fox pangram](docs/Emulated%20pangram.png)

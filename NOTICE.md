@@ -1,6 +1,6 @@
 # Asset credits and rights
 
-The owner has not selected a general reuse license for the project code, models, type specimens or Hilda recordings. This notice identifies separate third-party material.
+Project software is [MIT licensed](LICENSE). Original model and recording assets are [CC BY 4.0](LICENSES/CC-BY-4.0.txt). See the [asset map](ASSETS.md) for coverage and attribution. The following credits identify source material and engine terms.
 
 - Godiva’s typebar and bell recordings use supersupernator’s CC0 [Hermes 3000 recording](https://freesound.org/people/supersupernator/sounds/519622/).
 - Godiva’s spacebar uses Joseph Sardin’s CC0 [spacebar](https://bigsoundbank.com/typewriter-space-s2843.html) and [Hermes Precisa recording](https://bigsoundbank.com/typewriter-8-s2841.html).

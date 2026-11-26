@@ -510,7 +510,7 @@ func factory_reset_error(message:String):
 func show_credits():
 	var dialog_box=AcceptDialog.new();settings.add_child(dialog_box);dialog_box.title="About Typewriter Emulator"
 	var text=TextEdit.new();text.editable=false;text.wrap_mode=TextEdit.LINE_WRAPPING_BOUNDARY;text.custom_minimum_size=Vector2(470,280)
-	text.text="Typewriter Emulator\n"+machine_profile.credits+"\n\nGodot Engine\n"+Engine.get_license_text()+"\n\n"
+	text.text="Typewriter Emulator by ImperishableNEET and contributors\nCode: MIT. Published original models and recordings: CC BY 4.0. Credited third-party sound recordings: CC0.\nhttps://github.com/ImperishableNEET/Typewriter-Emulator/blob/main/ASSETS.md\n\n"+machine_profile.credits+"\n\nGodot Engine\n"+Engine.get_license_text()+"\n\n"
 	for item in Engine.get_copyright_info():
 		text.text+=str(item.name)+"\n"
 		for part in item.parts:text.text+="\n".join(part.copyright)+"\n"+str(part.license)+"\n"
