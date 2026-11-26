@@ -24,6 +24,13 @@ try {
         throw "Hilda keyboard check failed. See $log"
     }
     Write-Host "HILDA_KEYBOARD_OK ($log)"
+    $log = Join-Path $folder.FullName 'carriage.log'
+    & $engine --headless --main-pack $candidate --quit-after 1200 --script (Join-Path $PSScriptRoot 'carriage.gd') *> $log
+    if ($LASTEXITCODE -or !(Select-String -LiteralPath $log -SimpleMatch 'HILDA_CARRIAGE_OK') -or (Select-String -LiteralPath $log -Pattern 'ERROR:')) {
+        Get-Content -LiteralPath $log -Tail 30 | Write-Host
+        throw "Hilda carriage check failed. See $log"
+    }
+    Write-Host "HILDA_CARRIAGE_OK ($log)"
 } finally {
     $env:APPDATA = $originalAppData
     $env:HILDA_QA = $originalGuard

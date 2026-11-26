@@ -3,6 +3,7 @@ extends Control
 const Shelf = preload("res://machines/MachineShelf.gd")
 const Writer = preload("res://Writer.gd")
 const PANGRAM := "The quick brown fox jumps over the lazy dog."
+const LINE_SPACING := [1.0, 1.5, 2.0, 0.0]
 @export var machine_profile:Resource
 var writer
 var machine
@@ -20,6 +21,8 @@ var demo_timer := Timer.new()
 var demo_button:Button
 var demo_index := -1
 var strike_audio
+var spacing_control := OptionButton.new()
+var tabs_control := MenuButton.new()
 
 func _ready():
 	writer = Writer.new(machine_profile.load_manifest(), machine_profile)
@@ -58,15 +61,17 @@ func _ready():
 	left.add_child(tools)
 	var title := heading(tools, "Operator’s view", 22)
 	title.size_flags_horizontal = Control.SIZE_EXPAND_FILL
-	var rear := Button.new()
-	tools.add_child(rear)
-	rear.text = "Rear view"
-	rear.toggle_mode = true
-	rear.focus_mode = Control.FOCUS_NONE
-	rear.toggled.connect(func(enabled):
-		machine.set_rear_view(enabled)
-		title.text = "Rear view" if enabled else "Operator’s view"
-		rear.text = "Operator view" if enabled else "Rear view")
+	var views := MenuButton.new()
+	tools.add_child(views)
+	views.text = "View ▾"
+	views.focus_mode = Control.FOCUS_NONE
+	for view_name in ["Operator’s view", "Carriage close-up", "Rear view"]:
+		views.get_popup().add_item(view_name)
+	views.get_popup().id_pressed.connect(func(index):
+		machine.set_carriage_view(false)
+		machine.set_rear_view(index==2)
+		if index==1: machine.set_carriage_view(true)
+		title.text = views.get_popup().get_item_text(index))
 	var cover := Button.new()
 	tools.add_child(cover)
 	cover.text = "Open cover"
@@ -80,6 +85,7 @@ func _ready():
 	machine.size_flags_vertical = Control.SIZE_EXPAND_FILL
 	machine.setup(writer)
 	machine.printing_key_pressed.connect(press_cap)
+	machine.carriage_control_requested.connect(operate_carriage)
 	strike_audio = preload("res://machines/hilda/HildaAudio.gd").new()
 	add_child(strike_audio)
 	strike_audio.setup(machine)
@@ -124,6 +130,22 @@ func _ready():
 		writer.data.ribbon = machine_profile.ribbon_modes[index]
 		refresh()
 		save_timer.start())
+	footer.add_child(spacing_control)
+	spacing_control.focus_mode = Control.FOCUS_NONE
+	spacing_control.tooltip_text = "Line-spacing selector on the left carriage end"
+	for label in ["Single spacing", "1½ spacing", "Double spacing", "Free platen"]:
+		spacing_control.add_item(label)
+	spacing_control.item_selected.connect(func(index): operate_carriage("spacing", index))
+	footer.add_child(tabs_control)
+	tabs_control.text = "Tab stops ▾"
+	tabs_control.focus_mode = Control.FOCUS_NONE
+	var tab_menu := tabs_control.get_popup()
+	tab_menu.add_item("Advance to next stop   (Tab)")
+	tab_menu.add_item("Set stop here   (Ctrl+=)")
+	tab_menu.add_item("Clear stop here   (Ctrl+−)")
+	tab_menu.add_item("Clear all stops   (Ctrl+.)")
+	tab_menu.id_pressed.connect(func(index):
+		operate_carriage(["tab", "tab_set", "tab_clear", "tab_clear_all"][index], 1.0))
 	footer.add_child(status)
 	add_child(save_timer)
 	save_timer.one_shot = true
@@ -150,6 +172,23 @@ func button(parent:Control, caption:String, action:Callable) -> Button:
 
 func _unhandled_key_input(event:InputEvent):
 	if not event is InputEventKey: return
+	var code:int = event.physical_keycode if event.physical_keycode else event.keycode
+	var tab_action := ""
+	if not (event.alt_pressed or event.meta_pressed):
+		if event.ctrl_pressed:
+			if code in [KEY_EQUAL, KEY_PLUS, KEY_KP_ADD]: tab_action = "tab_set"
+			elif code in [KEY_MINUS, KEY_KP_SUBTRACT]: tab_action = "tab_clear"
+			elif code == KEY_PERIOD and not event.shift_pressed: tab_action = "tab_clear_all"
+		elif code == KEY_TAB and not event.shift_pressed:
+			tab_action = "tab"
+	if not tab_action.is_empty():
+		if event.pressed and not event.echo: operate_carriage(tab_action, 1.0)
+		get_viewport().set_input_as_handled()
+		return
+	if event.alt_pressed and not (event.ctrl_pressed or event.meta_pressed or event.shift_pressed) and event.keycode in [KEY_UP,KEY_DOWN]:
+		if event.pressed: operate_carriage("platen",-1.0 if event.keycode==KEY_UP else 1.0)
+		get_viewport().set_input_as_handled()
+		return
 	if event.ctrl_pressed or event.alt_pressed or event.meta_pressed:
 		var shortcuts:Dictionary = machine_profile.keyboard.SHORTCUTS
 		if event.ctrl_pressed and event.alt_pressed and event.shift_pressed and not event.meta_pressed and shortcuts.has(event.keycode):
@@ -169,7 +208,7 @@ func _unhandled_key_input(event:InputEvent):
 			type_character(character)
 			get_viewport().set_input_as_handled()
 		return
-	var code:int = event.physical_keycode if writer.data.physical and event.physical_keycode else event.keycode
+	if not writer.data.physical: code = event.keycode
 	if not writer.data.physical and not event.shift_pressed and code in [KEY_1, KEY_KP_1]:
 		stop_demo()
 		type_character("1")
@@ -243,12 +282,18 @@ func type_demo_character():
 		demo_timer.start(clampf(writer.paste_interval(glyph,PANGRAM[demo_index],5.5),0.11,0.4))
 
 func type_character(character:String, duplicate_face_shift:=false):
-	if viewed_page >= 0 or not writer.data.sheet_loaded: return
+	if viewed_page >= 0 or not writer.data.sheet_loaded or machine.registration_pulled: return
 	var prior_column:int = writer.data.col
+	var prior_half:float = writer.data.half
+	var prior_platen:float = writer.data.platen_half
 	var event = writer.action(character, Time.get_ticks_msec(), true, false, -1., true)
 	if event.is_empty():
 		if character == " " and writer.data.col != prior_column:
 			machine.space_advance(prior_column)
+		elif character == "\n" and writer.message.is_empty():
+			machine.carriage_motion("return",prior_column,prior_half,prior_platen)
+		elif character == "\t" and writer.message.is_empty():
+			machine.carriage_motion("tab",prior_column,prior_half,prior_platen)
 		refresh()
 	else:
 		# Both faces on the comma and period slugs print the same character.
@@ -259,12 +304,53 @@ func type_character(character:String, duplicate_face_shift:=false):
 			refresh())
 	save_timer.start()
 
+func operate_carriage(control:String,value:float):
+	if viewed_page >= 0: return
+	if machine.registration_pulled and control!="register": return
+	stop_demo()
+	writer.message=""
+	match control:
+		"tab":
+			type_character("\t")
+			return
+		"tab_set", "tab_clear":
+			if control == "tab_set": writer.set_tab_here()
+			else: writer.clear_tab_here()
+			machine.carriage_motion(control, writer.data.col, writer.data.half, writer.data.platen_half)
+			var verb := "set" if control == "tab_set" else "cleared"
+			writer.message = "Tab %s at column %d" % [verb, writer.data.col + 1]
+		"tab_clear_all":
+			writer.clear_all_tabs()
+			writer.message = "All tab stops cleared"
+		"return":
+			type_character("\n")
+			return
+		"spacing":
+			var index := int(value)
+			if index < 0 or index >= LINE_SPACING.size(): return
+			writer.data.spacing = LINE_SPACING[index]
+			writer.data.free_platen = index==3
+		"platen":
+			var before:float = writer.data.half
+			var before_platen:float = writer.data.platen_half
+			writer.turn(value)
+			machine.carriage_motion("platen",writer.data.col,before,before_platen)
+		"register":
+			if not machine.registration_pulled: return
+			writer.PaperGrab.turn(writer,value,false)
+		_: return
+	refresh()
+	save_timer.start()
+
 func refresh():
 	machine.sync()
 	paper.queue_redraw()
 	reading_line.queue_redraw()
 	var count:int = writer.data.finished_pages.size()
 	var reading := viewed_page >= 0
+	spacing_control.disabled = reading
+	tabs_control.disabled = reading
+	spacing_control.select(3 if writer.data.free_platen else maxi(0,LINE_SPACING.find(float(writer.data.spacing))))
 	page_title.text = ("%s · Sheet %d of %d" % [str(writer.data.finished_pages[viewed_page].get("machine_id","godiva")).capitalize(), viewed_page+1, count]) if reading else ("Mounted sheet" if writer.data.sheet_loaded else "Empty platen")
 	reading_line.visible = not reading and writer.data.sheet_loaded
 	if demo_button: demo_button.disabled = reading or not writer.data.sheet_loaded
@@ -275,7 +361,7 @@ func refresh():
 	draft.visible = reading and writer.data.sheet_loaded
 	stack_action.text = "Stack sheet" if writer.data.sheet_loaded else "Load sheet"
 	stack_action.visible = not reading or not writer.data.sheet_loaded
-	status.text = writer.message if writer.message else "Line %d   Column %d" % [1+int(writer.data.half/2), writer.data.col+1]
+	status.text = writer.message if writer.message else "Line %s   Column %d" % [str(snappedf(1.+float(writer.data.half)/2.,0.01)), writer.data.col+1]
 
 func browse(index:int):
 	if index < -1 or index >= writer.data.finished_pages.size(): return
@@ -304,4 +390,6 @@ func _notification(what):
 	if what == NOTIFICATION_WM_CLOSE_REQUEST and machine:
 		machine.flush()
 		save_draft()
-	if what == NOTIFICATION_APPLICATION_FOCUS_OUT and machine: machine.set_shift(false)
+	if what == NOTIFICATION_APPLICATION_FOCUS_OUT and machine:
+		machine.set_shift(false)
+		machine.release_registration()

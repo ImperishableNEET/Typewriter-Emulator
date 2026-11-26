@@ -170,6 +170,28 @@ func bank_center_column()->int:return roundi((dimensions().x*.5-MARGIN)/PITCH-.5
 func max_col()->int:return floori((dimensions().x-2*MARGIN)/float(PITCH))-1
 func rail_left()->int:return ceili(-float(MARGIN)/PITCH)
 func rail_right()->int:return floori(float(dimensions().x-MARGIN)/PITCH)-1
+
+# Stops are stored in sheet columns; new_stock shifts them by the change in
+# sheet origin so each rider stays at its physical position on the carriage.
+func set_tab_here():
+	var column := int(data.col)
+	if column not in data.tabs:
+		data.tabs.append(column)
+
+func clear_tab_here():
+	data.tabs.erase(int(data.col))
+
+func clear_all_tabs():
+	data.tabs.clear()
+
+func next_tab_column() -> int:
+	var column := int(data.col)
+	var destination := rail_right() if margin_bypassed() else int(data.right)
+	for stop in data.tabs:
+		if int(stop) > column:
+			destination = mini(destination, int(stop))
+	return maxi(column, destination)
+
 func carriage_held()->bool:
 	return carriage_buttons.left or carriage_buttons.right
 func carriage_release_held(side:String)->bool:
@@ -408,18 +430,17 @@ func action(ch:String,clock:int,defer_ink:=false,analog_candidate:=false,pointer
 		message="Carriage released • let go to type"
 		return {}
 	if ch=="\n":
-		if not data.paper_loose and float(data.half)+2*int(data.spacing)>max_half():message="Bottom of sheet";return {}
+		var feed_half_lines := 2.0 * float(data.spacing)
+		if not data.paper_loose and float(data.half)+feed_half_lines>max_half():message="Bottom of sheet";return {}
 		data.margin_released=false
 		move_col(rail_left() if margin_held else int(data.left))
-		turn(2*int(data.spacing));return {}
+		turn(feed_half_lines);return {}
 	if ch=="\b":
 		var stop=rail_left() if margin_held or data.col<data.left else int(data.left)
 		move_col(maxi(stop,data.col-1));return {}
 	if ch=="\t":
-		var target=rail_right() if margin_bypassed() else int(data.right)
-		for t in data.tabs:
-			if t>data.col:target=mini(target,int(t))
-		move_col(maxi(target,data.col));return {}
+		move_col(next_tab_column())
+		return {}
 	if data.jammed:message="Typebars jammed • release to continue";return {}
 	if data.col>rail_right():message="Paper edge • return the carriage";return {}
 	if data.col>data.right and not margin_bypassed():message="Right margin • press \\ to continue or return the carriage";return {}

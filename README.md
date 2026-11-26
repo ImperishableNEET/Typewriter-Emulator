@@ -14,6 +14,12 @@ Choose **Machines → Hilda**, then **Open cover** and **Type pangram**. You can
 
 [Full Olympia keyboard proof](docs/Keyboard%20proof.png) · [Hilda’s recorded strikes](docs/Recorded%20strikes.md)
 
+On Hilda, choose **View → Carriage close-up** for the return lever, spacing selector and platen knobs. Enter returns the carriage. The selector offers single, 1½, double and free settings. Turn either knob to move the sheet, or use Alt+Up/Down for a half-line adjustment.
+
+To register a form between lines, Ctrl-drag Hilda’s left platen knob or drag it outward first and then turn it. Release it at the desired height. The next carriage return preserves that baseline offset. Right-click during the adjustment to cancel.
+
+On either machine, **Ctrl+.** clears all tab stops, **Ctrl+=** sets a stop at the current column, and **Ctrl+-** clears that stop. Press **Tab** between entries to type aligned columns. You can also click Hilda’s **set** and **clear** keys beside the spacebar and her **TAB** key at the top right. [Hilda’s typed table](docs/Tab%20stop%20proof.png)
+
 ## Build and verify on Windows
 
 Install Godot 4.4.1 and its matching Windows export templates. From the repository root in PowerShell, set `$godot` to the console executable.
@@ -26,6 +32,7 @@ $exe = Join-Path (Resolve-Path build) 'Typewriter Emulator.exe'
 & $godot --headless --path GodivaStudio --export-release 'Windows Desktop' $exe
 & ./Baseline/Godiva/Verify.ps1 -Godot $godot -Executable $exe
 & ./Baseline/Hilda/Verify.ps1 -Godot $godot -Executable $exe
+& ./Baseline/TabStops/Verify.ps1 -Godot $godot -Executable $exe
 ```
 
 Tests use a temporary Windows profile to protect mounted drafts. The optional Windows Wooting bridge can be compiled with MinGW using the command at the top of [wooting_touch.c](Source/wooting_touch.c). It uses the operator’s locally installed analog SDK. The default checkout uses simulated touch.

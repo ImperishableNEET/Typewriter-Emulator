@@ -26,6 +26,9 @@ try {
     Check 'GODIVA_BASELINE_MATCH' @('--script',(Join-Path $root 'Baseline/Godiva/compare.gd'))
     Check 'HILDA_FIRST_ACTION_OK' @('--script',(Join-Path $root 'Baseline/Hilda/first_action.gd'))
     Check 'HILDA_KEYBOARD_OK' @('--script',(Join-Path $root 'Baseline/Hilda/keyboard.gd'))
+    Check 'HILDA_CARRIAGE_OK' @('--script',(Join-Path $root 'Baseline/Hilda/carriage.gd'))
+    Check 'SHARED_TABS_OK' @('--script',(Join-Path $root 'Baseline/shared_tabs.gd'))
+    & (Join-Path $root 'Baseline/TabStops/Verify.ps1') -Godot $engine
 } finally {
     $env:APPDATA,$env:GODIVA_FIXTURE_DIR,$env:HILDA_QA,$env:HILDA_PROOF = $prior
     $env:TEMP = $originalTemp

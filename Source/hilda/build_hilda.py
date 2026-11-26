@@ -392,34 +392,135 @@ for side in (-1,1):
              [(i,i+2,i+3,i+1) for i in (0,2,4)],m,frame)
     rod("Ribbon fork",(side*.13,.88,.88),(side*.10,.91,1.09),.014,steel,frame)
 
-# Platen, paper table, bail, stops and left carriage-return lever from 02/12/13.
-rod("Platen axle",(-1.73,1.03,1.12),(1.73,1.03,1.12),.045,steel,car,20)
-rod("Rubber platen",(-1.39,1.03,1.12),(1.39,1.03,1.12),.12,rubber,car,64)
+# Carriage left end and return handpiece: compare owner photos 02, 12 and 19.
+# Fixed shaft coordinates also register the runtime paper wrap to the platen.
+axle_y, axle_z = 1.03, 1.12
+roll=pivot("HildaPlatenRoll",(0,axle_y,axle_z),car)
+ret=pivot("HildaReturnLever",(-1.515,1.304,1.167),car)
+line_selector=pivot("HildaLineSpacingSelector",(-1.443,axle_y,axle_z),car)
+
+
+def turned(name, profile, parent, materials, segments=128, corrugation=()):
+    """Lathe an X-axis part. Rows specify X, radius, rib depth, and surface material."""
+    verts=[]
+    faces=[]
+    for x,r,depth,mat_index in profile:
+        for i in range(segments):
+            a=math.tau*i/segments
+            rr=r+depth*corrugation[i%len(corrugation)] if corrugation else r
+            verts.append((x,axle_y+rr*math.cos(a),axle_z+rr*math.sin(a)))
+    faces.append(tuple(reversed(range(segments))))
+    for j in range(len(profile)-1):
+        for i in range(segments):
+            a=j*segments+i
+            b=j*segments+(i+1)%segments
+            faces.append((a,b,b+segments,a+segments))
+    faces.append(tuple(range(len(verts)-segments,len(verts))))
+    if profile[-1][0]<profile[0][0]:
+        faces=[face[::-1] for face in faces]
+    ob=mesh(name,verts,faces,materials[0],parent)
+    for mat in materials[1:]:
+        ob.data.materials.append(mat)
+    for poly in ob.data.polygons:
+        if 0<poly.index<len(faces)-1:
+            ring=(poly.index-1)//segments
+            poly.material_index=profile[ring][3]
+            poly.use_smooth=True
+    ob.data.polygons[-1].material_index=profile[-1][3]
+    return ob
+
+
+rod("Platen axle",(-1.73,axle_y,axle_z),(1.73,axle_y,axle_z),.045,steel,roll,24)
+# Photo 12 shows faint, pitch-spaced polished strike tracks on the bare rubber.
+wear=material("Olympia polished platen tracks",(.051,.047,.043),.03,.58)
+rubber_profile=[(-1.39,.114,0,0),(-1.377,.12,0,0)]
+for i in range(75):
+    x=(i-37)*.0318
+    rubber_profile.extend([(x,.12,0,1),(x+.0022,.1201,0,0)])
+rubber_profile.extend([(1.377,.12,0,0),(1.39,.114,0,0)])
+turned("Rubber platen",rubber_profile,roll,[rubber,wear],64)
 box("Paper table",(0,1.27,1.13),(2.77,.057,.317),base,car,.018)
 box("Graduated carriage rail",(0,1.37,1.30),(2.87,.079,.088),ivory,car,.014)
-for i in range(79):
-    x=(i-39)*.034
-    h=.032 if i%5==0 else .016
-    box("Pitch index",(x,1.327,1.30+h/2),(.004,.004,h),dark,car,0)
+for i in range(81):
+    x=(i-40)*.034
+    h=.035 if i%5==0 else .019
+    box("Pitch index",(x,1.329,1.342-h/2),(.0035,.003,h),dark,car,0)
+    if i%10==0:
+        text("Carriage scale "+str(i),str(i),(x,1.327,1.284),.032,black,car,math.pi/2)
 rod("Paper bail",(-1.38,.982,1.27),(1.38,.982,1.27),.014,steel,car)
-for s in (-1,1):
+for s,side in ((-1,"Left"),(1,"Right")):
     x=s*1.48
-    box("Carriage end casting",(x,1.095,1.065),(.135,.496,.287),barsteel,car,.032)
-    rod("Platen knob",(s*1.58,1.03,1.12),(s*1.745,1.03,1.12),.147,ivory,car,52)
-    rod("Green platen knob insert",(s*1.743,1.03,1.12),(s*1.753,1.03,1.12),.134,sage,car,52)
-    for j in range(48):
-        a=j*math.tau/48
-        y,z=1.03+.146*math.cos(a),1.12+.146*math.sin(a)
-        rod("Knob knurl",(s*1.59,y,z),(s*1.739,y,z),.0035,ivory,car,5)
+    # Rear folded carriage cheek tapers to a downward ear around the spindle.
+    cheek=[(.811,1.249),(1.015,1.276),(1.307,1.235),(1.333,1.194),
+           (1.317,.991),(1.19,.987),(1.103,.943),(.985,.947),(.825,1.040)]
+    xs=sorted((s*1.48,s*1.535))
+    end=skin(side+" carriage bearing cheek",[[(xx,y,z) for y,z in cheek[::-1]] for xx in xs],steel,car,.012)
+    cut(end,rod("Bearing cutter",(xs[0]-.04,axle_y,axle_z),(xs[1]+.04,axle_y,axle_z),.079,dark,car,32))
+    rod(side+" spindle bush",(s*1.48,axle_y,axle_z),(s*1.548,axle_y,axle_z),.067,barsteel,car,32)
+    # Narrow ivory spindle collar, fluted cream drum, radiused green end insert.
+    # All faces of each knob share one mesh so the complete left knob can pull out.
+    knob_profile=[(1.52,.054,0,0),(1.614,.055,0,0),(1.622,.127,0,0),
+                  (1.628,.139,.001,0),(1.638,.145,.0021,0),(1.769,.145,.0021,0),
+                  (1.778,.142,.001,0),(1.781,.139,0,1),(1.784,.135,0,1),
+                  (1.789,.124,0,1),(1.792,.096,0,1)]
+    turned("HildaPlatenKnob"+side,[(s*x,r,d,m) for x,r,d,m in knob_profile],roll,
+           [ivory,sage],240,(0,1,1,0))
     rod("Bail roller",(s*.55,.982,1.27),(s*.71,.982,1.27),.05,rubber,car,24)
     rod("Bail hinge arm",(s*1.39,.982,1.27),(s*1.39,1.19,1.115),.015,steel,car)
     box("Margin stop",(s*.99,1.36,1.355),(.075,.105,.044),barsteel,car)
-rod("Return lever neck",(-1.48,1.21,1.19),(-1.60,1.06,1.40),.027,steel,car)
-rod("Return lever arm",(-1.60,1.06,1.40),(-1.69,.14,1.40),.032,steel,car)
-box("Return lever black grip",(-1.69,.055,1.397),(.106,.48,.055),dark,car,.021)
-skin("Return lever polished spine",[
-    [(-1.74,-.43,z),(-1.718,-.47,z),(-1.57,.99,z),(-1.62,1.04,z)]
-    for z in (1.421,1.438)],steel,car,.008)
+    mesh(side+" margin pointer",[(s*.99,1.306,1.371),(s*.99-.014,1.306,1.351),
+                                (s*.99+.014,1.306,1.351)],[(0,1,2)],red,car)
+# A toothed wheel shows between the platen and the polished selector sector in 19.
+# 36 teeth approximate a half-line detent given the measured roller/pitch ratio.
+turned("HildaPlatenRatchet",[(-1.422,.135,.009,0),(-1.391,.135,.009,0)],roll,
+       [dark],144,(0,.92,1,0))
+rod("Return hinge socket",(-1.515,1.304,1.091),(-1.515,1.304,1.17),.073,steel,car,32)
+rod("Return shoulder pin",(-1.515,1.304,1.167),(-1.515,1.304,1.204),.038,barsteel,ret,24)
+# One bent sheet runs continuously over the knob, then widens into a long paddle.
+# Section positions follow the top-view sweep and the nearly horizontal upper edge
+# seen in profile, with a rolled lip on each side of the handpiece.
+sections=[(-1.513,1.322,1.190,.085,.022),(-1.515,1.249,1.191,.091,.022),
+          (-1.536,1.215,1.209,.086,.027),(-1.567,1.155,1.351,.074,.032),
+          (-1.586,1.117,1.407,.077,.027),(-1.60,1.087,1.423,.083,.023),
+          (-1.659,.778,1.424,.085,.024),(-1.694,.59,1.424,.100,.032),
+          (-1.704,.552,1.424,.116,.108),(-1.711,.519,1.424,.116,.122),
+          (-1.873,-.453,1.423,.101,.137),(-1.875,-.48,1.420,.094,.125)]
+def paddle_ring(x,y,z,w,h):
+    return [(x-w*.5,y,z-h+.008),(x-w*.46,y,z-h),(x+w*.46,y,z-h),
+            (x+w*.5,y,z-h+.008),(x+w*.5,y,z-.005),(x+w*.45,y,z),
+            (x-w*.45,y,z),(x-w*.5,y,z-.005)]
+skin("Return formed chrome arm",[paddle_ring(*s) for s in sections],steel,ret,.004)
+grip_sections=[(-1.71,.527,1.404,.102,.078),(-1.715,.499,1.404,.122,.091),
+               (-1.871,-.438,1.402,.107,.102),(-1.874,-.462,1.398,.096,.093)]
+skin("HildaReturnGrip",[paddle_ring(*s) for s in grip_sections],dark,ret,.006)
+# Owner photo 19: three burgundy capsule-shaped enamel indexes behind a screw;
+# the curled metal selector tab glides above this fixed sector.
+wine=material("Olympia engraved index enamel",(.103,.024,.023),0,.47)
+def sector_point(x,angle,r):
+    return (x,axle_y+r*math.sin(angle),axle_z+r*math.cos(angle))
+arc=[math.radians(k) for k in range(-59,46,4)]
+profile=[sector_point(-1.48,a,.173) for a in arc]+[sector_point(-1.48,a,.163) for a in reversed(arc)]
+skin("Polished line spacing index sector",[[(x,y,z) for _,y,z in reversed(profile)] for x in (-1.485,-1.425)],steel,car,.004)
+for idx,a in enumerate((-.19,-.018,.154)):
+    pts=[]
+    for k in range(16):
+        t=k*math.tau/16
+        pts.append(sector_point(-1.453+.021*math.cos(t),a+.036*math.sin(t),.174))
+    mesh("Line spacing index "+str(idx+1),pts,[tuple(range(len(pts)))],wine,car)
+# Flat-head screw normal to the sloping face of the sector.
+a=-.585
+screw_top=Vector(sector_point(-1.455,a,.175))
+normal=Vector((0,math.sin(a),math.cos(a)))
+rod("Selector sector retaining screw",screw_top-normal*.009,screw_top,.019,barsteel,car,24)
+tangent=Vector((0,math.cos(a),-math.sin(a)))
+long_axis=Vector((.014,0,0))+tangent*.004
+short_axis=tangent*.002-Vector((.0006,0,0))
+mesh("Index screw slot",[screw_top+normal*.001+u*long_axis+v*short_axis
+                        for u,v in ((-1,-1),(1,-1),(1,1),(-1,1))],[(0,1,2,3)],black,car)
+tongue=[(-1.457,1.038,1.178,.039,.083),(-1.461,1.082,1.274,.042,.036),
+        (-1.458,1.087,1.304,.051,.021),(-1.467,1.066,1.323,.055,.016),
+        (-1.471,1.043,1.323,.053,.016)]
+skin("HildaLineSpacingHandle",[paddle_ring(*s) for s in tongue],steel,line_selector,.004)
 guide=material("Olympia • amber transparent line guides",(.76,.60,.35),0,.19)
 guide.diffuse_color=(.76,.60,.35,.27)
 guide.node_tree.nodes.get("Principled BSDF").inputs["Alpha"].default_value=.27

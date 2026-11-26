@@ -571,10 +571,9 @@ func set_ribbon_direction(direction:int):
 func operate_tab_key(key:String,hid:=0):
 	var col=int(writer.data.col)
 	match key:
-		"+":
-			if col not in writer.data.tabs:writer.data.tabs.append(col)
-		"−":writer.data.tabs.erase(col)
-		"···":writer.data.tabs.clear()
+		"+":writer.set_tab_here()
+		"−":writer.clear_tab_here()
+		"···":writer.clear_all_tabs()
 	var fraction=machine.key_grabs.pointer_strength
 	if hid!=0 and wooting.connected:
 		var speed=wooting.take_speed(hid,Time.get_unix_time_from_system()*1000.)
