@@ -72,6 +72,12 @@ func _ready():
 		machine.set_rear_view(index==2)
 		if index==1: machine.set_carriage_view(true)
 		title.text = views.get_popup().get_item_text(index))
+	var support := OptionButton.new()
+	support.focus_mode = Control.FOCUS_NONE
+	for caption in ["Rest folded", "Rest raised", "Rest extended"]:
+		support.add_item(caption)
+	support.tooltip_text = "Fold, raise or extend the rear paper support"
+	support.item_selected.connect(func(index): machine.set_paper_support(index))
 	var cover := Button.new()
 	tools.add_child(cover)
 	cover.text = "Open cover"
@@ -106,6 +112,7 @@ func _ready():
 	reading_line.custom_minimum_size.y = 64
 	var footer := HFlowContainer.new()
 	main.add_child(footer)
+	footer.add_child(support)
 	var layout := CheckButton.new()
 	footer.add_child(layout)
 	layout.text = "Olympia layout"

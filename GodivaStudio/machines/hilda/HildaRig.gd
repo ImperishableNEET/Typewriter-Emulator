@@ -23,7 +23,7 @@ void fragment() {
 """
 const PIVOTS := [&"HildaCarriage", &"HildaRibbonCover", &"HildaShiftBasket",
 	&"HildaLeftShift", &"HildaRightShift", &"HildaPlatenRoll", &"HildaReturnLever",
-	&"HildaLineSpacingSelector"]
+	&"HildaLineSpacingSelector", &"HildaPaperSupport", &"HildaPaperSupportSlide"]
 const SERVICE_HANDLES := {
 	"Left knob":"HildaPlatenKnobLeft", "Right knob":"HildaPlatenKnobRight",
 	"Return":"HildaReturnGrip", "Spacing":"HildaLineSpacingHandle"}
@@ -58,6 +58,8 @@ var queue: Array[Dictionary] = []
 var elapsed := 0.0
 var cover_open := false
 var cover_depth := 0.0
+var support_setting := 0
+var support_travel := 0.0
 var cover_hinge := Vector3.ZERO
 var shift_held := false
 var shift_depth := 0.0
@@ -166,7 +168,22 @@ func setup(w) -> void:
 	shader.code = PAPER_SHADER
 	sheet_material.shader = shader
 	sheet.material_override = sheet_material
+	_pose_support()
 	sync()
+
+func set_paper_support(setting: int) -> void:
+	support_setting = clampi(setting, 0, 2)
+
+func _pose_support() -> void:
+	# Local X is across the carriage and local Y is up in the imported GLB.
+	# Retract the inner ruler before laying the folded channel into its recess.
+	var hinge: Node3D = pivots[&"HildaPaperSupport"]
+	var inner: Node3D = pivots[&"HildaPaperSupportSlide"]
+	var folded := 1.0 - smoothstep(0.0, 1.0, support_travel)
+	var home: Transform3D = rest[&"HildaPaperSupport"]
+	var flat := Basis(Vector3.RIGHT, -PI / 2.0) * Basis(Vector3.BACK, -PI / 2.0)
+	hinge.transform = home * Transform3D(Basis.IDENTITY.slerp(flat, folded), Vector3.ZERO)
+	inner.position = rest[&"HildaPaperSupportSlide"].origin - Vector3.UP * (1.17 * (1.0 - smoothstep(1.0, 2.0, support_travel)))
 
 func _register_printing_keys() -> void:
 	var nodes := {}
@@ -308,7 +325,13 @@ func _surface_point(x: float, depth: float) -> Vector3:
 	if arc <= PI:
 		return PLATEN_CENTER + Vector3(x, -PAPER_RADIUS * sin(arc), PAPER_RADIUS * cos(arc))
 	var tail := depth - PI * PAPER_RADIUS
-	return PLATEN_CENTER + Vector3(x, tail * 0.96, -PAPER_RADIUS - tail * 0.28)
+	# A raised rest holds the back of a long sheet upright at the contact line.
+	var free_tail := PLATEN_CENTER + Vector3(x, tail * 0.96, -PAPER_RADIUS - tail * 0.28)
+	if support_travel > 0.8 and tail > 0.78:
+		var at_rest := Vector3(x, 0.78 * 0.96, -PAPER_RADIUS - 0.78 * 0.28)
+		var held_tail := PLATEN_CENTER + at_rest + Vector3.UP * (tail - 0.78)
+		return free_tail.lerp(held_tail, smoothstep(0.8, 1.0, support_travel))
+	return free_tail
 
 func _shape_sheet(dims: Vector2i, half_line: float) -> void:
 	var units_per_pixel := COLUMN_PITCH / float(writer.PITCH)
@@ -320,6 +343,9 @@ func _shape_sheet(dims: Vector2i, half_line: float) -> void:
 		var height := printed_to + PI * PAPER_RADIUS * segment / 24.0
 		if height > 0 and height < total_height:
 			heights.append(height)
+	var contact_height := printed_to + PI * PAPER_RADIUS + 0.78
+	if contact_height < total_height and contact_height > 0:
+		heights.append(contact_height)
 	heights.append(total_height)
 	var mesh := SurfaceTool.new()
 	mesh.begin(Mesh.PRIMITIVE_TRIANGLES)
@@ -482,6 +508,12 @@ func _shift(shifted: bool, delta: float) -> void:
 func _process(delta: float) -> void:
 	if not model or not writer:
 		return
+	if support_travel != float(support_setting):
+		var contact_before := clampf(support_travel, 0.8, 1.0)
+		support_travel = move_toward(support_travel, float(support_setting), delta * 3.0)
+		_pose_support()
+		if contact_before != clampf(support_travel, 0.8, 1.0):
+			_shape_sheet(writer.dimensions(), paper_shape.z)
 	if pivots.has(&"HildaRibbonCover") and cover_depth != float(cover_open):
 		cover_depth = move_toward(cover_depth, float(cover_open), delta * 3.5)
 		var rotation_at_hinge := Basis(Vector3.RIGHT, -0.92 * smoothstep(0.0, 1.0, cover_depth))

@@ -155,16 +155,10 @@ basket=pivot("HildaShiftBasket",parent=frame)
 # Owner photos 01, 02 and 12: a thin shell lip follows the deeper rising base.
 for side in (-1,1):
     name="Left" if side<0 else "Right"
-    for label,x0,x1,profile,mat in [
-        ("lower casting",1.51,1.66,[(-1.58,.14),(-1.58,.25),(-.9,.38),(-.30,.54),
-             (.70,.68),(1.08,.58),(1.43,.69),(1.47,.53),(1.32,.13)],base),
-        ("removable cover cheek",1.50,1.655,[(-1.58,.25),(-1.58,.32),(-1.18,.43),
-             (-.76,.56),(-.53,.68),(-.38,.86),(-.32,1.035),(-.22,1.08),
-             (.71,1.085),(.74,.68),(-.30,.54),(-.90,.38)],enamel)]:
-        # Side profiles are clockwise when viewed from the machine's right.
-        p=frame if mat==base else cover
-        rings=[[(x,y,z) for y,z in reversed(profile)] for x in sorted((side*x0,side*x1))]
-        skin(name+" "+label,rings,mat,p,.033)
+    profile=[(-1.58,.14),(-1.58,.25),(-.9,.38),(-.30,.54),
+             (.70,.68),(1.08,.58),(1.43,.69),(1.47,.53),(1.32,.13)]
+    rings=[[(x,y,z) for y,z in reversed(profile)] for x in sorted((side*1.51,side*1.66))]
+    skin(name+" lower casting",rings,base,frame,.033)
     for y in (-1.13,1.10):
         rod(name+" rubber foot",(side*1.34,y,.045),(side*1.34,y,.15),.12,rubber,frame,20)
 box("Lower keyboard well",(0,-.58,.18),(3.12,1.99,.09),dark,frame,.045)
@@ -231,19 +225,133 @@ for s in (-1,1):
             angle=1.54 if s<0 else .48
             vert.co.x=x+dx*math.cos(angle)-dz*math.sin(angle)
             vert.co.z=z+dx*math.sin(angle)+dz*math.cos(angle)
-support=pivot("HildaPaperSupport",(0,1.35,1.2),car)
-box("Stowed telescopic paper support",(.691,1.355,1.21),(1.41,.083,.028),steel,support,.008)
+# Owner photo 20261126_004939: two telescoping bright metal sections.
+# The outer channel returns around the edges of the narrower graduated slide.
+mount_y, mount_z = 1.382, 1.22
+rod("Paper rest hinge barrel",(0,mount_y-.034,mount_z),(0,mount_y+.032,mount_z),.046,barsteel,car,32)
+support=pivot("HildaPaperSupport",(0,mount_y,mount_z),car)
+slide=pivot("HildaPaperSupportSlide",(0,mount_y,mount_z+1.16),support)
+
+def rest_channel(name,width,depth,length,start,parent):
+    half=width/2
+    wall=.004
+    lip=.012
+    profile=[(-half,depth),(-half,0),(-half+lip,0),(-half+lip,wall),
+             (-half+wall,wall),(-half+wall,depth-wall),(half-wall,depth-wall),
+             (half-wall,wall),(half-lip,wall),(half-lip,0),(half,0),(half,depth)]
+    rings=[[(x,mount_y+y,mount_z+z) for x,y in profile] for z in [start,start+length]]
+    return skin(name,rings,steel,parent,.0015)
+
+rest_channel("Paper rest rolled outer channel",.154,.035,1.28,0,support)
+rest_channel("Paper rest graduated slide",.129,.020,1.27,1.20,slide)
+box("Paper rest retaining collar",(0,mount_y+.013,mount_z+1.257),(.159,.044,.030),steel,support,.004)
+box("Paper rest scale enamel",(0,mount_y+.009,mount_z+1.864),(.080,.008,1.164),ivory,slide,.003)
+box("Paper rest folded tip",(0,mount_y+.009,mount_z+2.459),(.108,.026,.022),steel,slide,.003)
+for i in range(1,21):
+    z=mount_z+2.412-(i-1)*.058
+    if i in (1,5,10,15,20):
+        text("Paper rest numeral "+str(i),str(i),(0,mount_y+.004,z),.029,black,slide,math.pi/2)
+        for side in (-1,1):
+            box("Paper rest numbered tick",(side*.031,mount_y+.004,z),(.013,.002,.0035),black,slide,0)
+    else:
+        box("Paper rest line graduation",(0,mount_y+.004,z),(.037,.002,.0035),black,slide,0)
 box("Front fascia",(0,-1.525,.225),(3.28,.12,.13),base,frame,.040)
-box("Front rolled ivory sill",(0,-1.51,.302),(3.27,.15,.085),enamel,cover,.035)
-# The cover has an open-backed, reentrant trapezoid. No flat surface covers the basket.
-outline=[(-1.65,-.36),(1.65,-.36),(1.64,.75),(.40,.75),(.38,.68),
-         (.93,-.08),(.92,-.14),(-.92,-.14),(-.93,-.08),(-.38,.68),(-.40,.75),(-1.64,.75)]
-skin("Rolled ivory hood with basket aperture",
-     [[(x,y,z+.035*y) for x,y in outline] for z in (1.016,1.085)],enamel,cover,.030)
-box("Olympia emblem fascia",(0,-.315,.925),(3.18,.093,.296),enamel,cover,.035)
+# A single folded cover. Sections wrap from the keyboard and typebasket openings
+# over the radiused outside shoulders to the seam with the basalt casting.
+# The front and rear corners also turn in plan. Photo 03 distinguishes the
+# long concave keyboard slope from the short convex roll into the flat deck.
+stations=[
+    # y, crown z, half-width, inner edge x, bridge across the centre
+    (-1.581,.277,1.585,1.41,True),(-1.577,.298,1.607,1.41,True),
+    (-1.564,.313,1.627,1.41,True),(-1.542,.324,1.643,1.41,True),
+    (-1.515,.334,1.652,1.41,True),(-1.467,.350,1.655,1.41,True),
+    (-1.459,.352,1.655,1.444,False),(-1.443,.358,1.655,1.467,False),
+    (-1.421,.366,1.655,1.480,False),(-1.39,.376,1.655,1.484,False),
+    (-1.15,.462,1.655,1.484,False),(-.94,.541,1.655,1.484,False),
+    (-.77,.611,1.655,1.484,False),(-.63,.683,1.655,1.484,False),
+    (-.52,.752,1.655,1.484,False),(-.447,.815,1.655,1.484,False),
+    (-.401,.870,1.655,1.484,False),(-.380,.906,1.655,1.480,False),
+    (-.366,.940,1.655,1.468,True),(-.352,.979,1.655,1.455,True),
+    (-.337,1.019,1.655,1.45,True),(-.323,1.048,1.655,1.45,True),
+    (-.306,1.065,1.655,1.45,True),(-.283,1.073,1.655,1.45,True),
+    (-.238,1.077,1.655,1.45,True),(-.143,1.081,1.655,.869,True),
+    (-.139,1.081,1.655,.895,False),(-.127,1.082,1.655,.913,False),
+    (-.107,1.083,1.655,.921,False),(-.083,1.084,1.655,.914,False),
+    (.62,1.106,1.655,.405,False),(.663,1.107,1.655,.390,False),
+    (.695,1.108,1.650,.390,False),(.724,1.106,1.637,.396,False),
+    (.742,1.097,1.612,.411,False),(.751,1.077,1.583,.428,False)]
+vertices,faces,lookup=[],[],{}
+def vertex(x,y,z):
+    point=(x,y,z)
+    if point not in lookup:
+        lookup[point]=len(vertices)
+        vertices.append(point)
+    return lookup[point]
+def seam(y):
+    for a,b in zip(seam_points,seam_points[1:]):
+        if y<=b[0]:
+            return a[1]+(b[1]-a[1])*(y-a[0])/(b[0]-a[0])
+    return seam_points[-1][1]
+seam_points=[(-1.59,.255),(-.9,.386),(-.30,.546),(.70,.686),(.76,.689)]
+sections=[]
+previous={}
+for row,(y,top,width,opening,bridge) in enumerate(stations):
+    current={}
+    bottom=seam(y)
+    rz=min(.061,(top-bottom)*.62)
+    for side in (-1,1):
+        shoulder=width-.084
+        section=[(opening,top),(shoulder,top)]
+        for step in range(1,9):
+            angle=math.pi*.5*step/8
+            section.append((shoulder+.072*math.sin(angle),top-rz*(1-math.cos(angle))))
+        section.append((width,bottom))
+        strip=[vertex(side*x,y,z) for x,z in section]
+        current[side]=strip
+        if row:
+            prior=previous[side]
+            for i in range(len(strip)-1):
+                q=(prior[i],prior[i+1],strip[i+1],strip[i])
+                faces.append(q if side==1 else q[::-1])
+    if row and stations[row-1][4] and row!=19:
+        faces.append((previous[-1][0],previous[1][0],current[1][0],current[-1][0]))
+    previous=current
+    sections.append(current)
+# Close each end across the formed shoulder as well as the flat sill.
+first,last=sections[0],sections[-1]
+faces.append(tuple(first[1][::-1]+first[-1]))
+for side in (-1,1):
+    cap=last[side]
+    x,y,z=vertices[cap[0]]
+    lower=vertex(x,y,z-.032)
+    corner=vertex(side*(stations[-1][2]-.043),y,z-.032)
+    face=tuple(cap+[corner,lower])
+    faces.append(face if side==1 else face[::-1])
+# Turn the ends of the badge face back into the keyboard opening. Its centre
+# is almost upright; the last few centimetres sweep forward into each cheek.
+previous_band=None
+for i in range(15,19):
+    y,z,_,edge,_=stations[i]
+    centre_y=-.366+(z-.94)*.275
+    offsets=[(-edge,0),(-edge+.007,.36),(-edge+.022,.68),(-edge+.044,.91),
+             (-edge+.075,1),(edge-.075,1),(edge-.044,.91),(edge-.022,.68),
+             (edge-.007,.36),(edge,0)]
+    band=[vertex(x,y+(centre_y-y)*factor,z) for x,factor in offsets]
+    if previous_band:
+        for j in range(len(band)-1):
+            faces.append((previous_band[j],previous_band[j+1],band[j+1],band[j]))
+    previous_band=band
+faces.append(tuple(previous_band+[sections[19][1][0],sections[19][-1][0]]))
+shell=mesh("One-piece rolled ivory cover",vertices,faces,enamel,cover)
+for face in shell.data.polygons:
+    face.use_smooth=True
+gauge=shell.modifiers.new("Formed sheet thickness","SOLIDIFY")
+gauge.thickness=.012
+gauge.offset=-1
+soften(shell,.004,3)
 script_path=Path("C:/Windows/Fonts/BRUSHSCI.TTF")
 script=bpy.data.fonts.load(str(script_path)) if script_path.exists() else None
-text("Raised Olympia script","Olympia",(0,-.364,.94),.182,steel,cover,math.pi/2,script)
+text("Raised Olympia script","Olympia",(0,-.389,.873),.151,steel,cover,math.radians(75),script)
 
 # Owner photo 09 shows an exclamation mark above the three-quarters fraction.
 rows=[
@@ -296,7 +404,9 @@ for x,w,s in ((-1.0,.228,"clear"),(0,1.74,""),(1.0,.228,"set")):
     if s:
         text("Tabulator "+s+" legend",s,(x,-1.369,.418),.068,black,frame)
 for i,m in enumerate((blue,ivory,red)):
-    box("Ribbon selector index "+str(i),(1.582,-.96-i*.075,.505-i*.024),(.041,.032,.012),m,cover,.004)
+    marker=box("Ribbon selector index "+str(i),(1.569,-.96-i*.075,.539-i*.028),(.041,.032,.012),m,cover,.004)
+    for v in marker.data.vertices:
+        v.co.z+=(v.co.y-(-.96-i*.075))*.37
 
 # The photographs establish the radiating bar bank. Slot assignment within it
 # is inferred from the lateral key positions and keeps H in the central slot.
@@ -543,10 +653,10 @@ scene.world.color=(.23,.23,.23)
 camera_data=bpy.data.cameras.new("Owner view")
 camera=bpy.data.objects.new("Owner view",camera_data)
 scene.collection.objects.link(camera)
-camera.location=(2.10,-5.55,3.95)
-camera.rotation_euler=(Vector((0,0,.71))-camera.location).to_track_quat('-Z','Y').to_euler()
+camera.location=(1.45,-7.1,4.65)
+camera.rotation_euler=(Vector((0,0,1.78))-camera.location).to_track_quat('-Z','Y').to_euler()
 camera.data.type='ORTHO'
-camera.data.ortho_scale=4.60
+camera.data.ortho_scale=5.25
 scene.camera=camera
 for a in bpy.context.screen.areas:
     if a.type=='VIEW_3D':
@@ -560,7 +670,7 @@ shading.light='STUDIO'
 shading.show_shadows=True
 shading.show_cavity=True
 shading.cavity_type='WORLD'
-scene.render.resolution_x,scene.render.resolution_y,scene.render.resolution_percentage=900,670,100
+scene.render.resolution_x,scene.render.resolution_y,scene.render.resolution_percentage=930,900,100
 scene.render.film_transparent=False
 scene.render.filepath=str(Path(tempfile.gettempdir())/'hilda-model'/'Hilda preview.png')
 Path(scene.render.filepath).parent.mkdir(exist_ok=True)
